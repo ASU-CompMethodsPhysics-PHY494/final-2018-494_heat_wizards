@@ -92,26 +92,32 @@ def CrankNicolson_1D(length, time, dx, dt, insulation, wall_thickness, step = 20
     for cellIndex in range(spatialCells):
         # Wall Cells (Left)
         if cellIndex < wallCells:
+            # Insulation Material
             kappa[cellIndex] = 237
             c_heat[cellIndex] = 900
             rho[cellIndex] = 2700
         # Interior Cells
         elif cellIndex < (wallCells + interiorCells):
+            # Air
             kappa[cellIndex] = 2.624
             c_heat[cellIndex] = 1000
             rho[cellIndex] = 1.204
         # Wall Cells (Right)
         else:
+            # Insulation Material
             kappa[cellIndex] = 237
             c_heat[cellIndex] = 900
             rho[cellIndex] = 2700
 
     # Define the thermal diffusivity constant at each spatial cell.
     eta = kappa * dt / (c_heat * rho * dx**2)
-    print(eta)
+
     # Create an array to store the temperature at each spatial cell and create
     # an additional 2D array to store the temperature values in space and time
     # for plotting purposes.
+    # Note: The step parameter represents the number of time steps being record-
+    #       ed for the final plot. By default, the plot will be rendered based
+    #       on 20 steps in time while the iterations are based on dt.
     T = np.zeros(spatialCells)
     timeEvolvingT = np.zeros((int(np.ceil(temporalCells / step)) + 1, spatialCells))
 
@@ -132,36 +138,55 @@ def CrankNicolson_1D(length, time, dx, dt, insulation, wall_thickness, step = 20
     #
     #   M_eta * T[1:-1, t+1] = bT
 
+    # Define the dimensionality of the square tridiagonal matrix, M_eta.
     dimension = spatialCells - 2
 
+    # Define relevant constants when solving the matrix equation.
     alpha = 2/eta + 2
     beta = 2/eta - 2
 
+    # Explicitly define the tridiagonal matrix, M_eta.
     M_eta = np.diagflat(-np.ones(dimension - 1), 1) + \
             np.diagflat(alpha[1:-1], 0) + \
             np.diagflat(-np.ones(dimension - 1), -1)
 
-    #for i in range(dimension - 1):
-    #    M_eta[i, i] = alpha[i + 1]
-
+    # Initialize the terms at the current timestep.
     bT = np.zeros(dimension)
 
+    # Define the inverse to the tridiagonal matrix, M_eta, once in order to im-
+    # prove the efficiency of the algorithm since this will create the inverse
+    # once rather than during each iteration using np.linalg.solve().
     inv_M_eta = np.linalg.inv(M_eta)
 
+    # Define a token to represent the steps in time being stored for plotting
+    # and initialize the initial time step to the initial conditions of the
+    # system.
     t_index = 0
     timeEvolvingT[t_index, :] = T
 
-    for jt in range(1, temporalCells):
+    # Simulate!
+    # The simulation is conducted for all timesteps not including the initial
+    # time, t = 0, since that has been defined by the conditions.
+    for t in range(1, temporalCells):
+        # Define the temperature values at the previous timestep that contribute
+        # to the next timestep's temperatures.
         bT[:] = T[:-2] + beta[1:-1] * T[1:-1] + T[2:]
-        #for i in range(dimension - 1):
-        #    bT[i] = beta[i + 1] * T[i + 1]
 
-        bT[0] += 311 + np.sin(jt + 1)
-        bT[-1] += 311 + np.sin(jt + 1)
+        # Update the boundary values to account for the boundary at the next
+        # timestep.
+        bT[0] += 311 + np.sin(t/3600)
+        bT[-1] += 311 + np.sin(t/3600)
 
+        # Solve the matrix equation using the predefined inverse rather than
+        # using np.linalg.solve().
         T[1:-1] = np.dot(inv_M_eta, bT)
+        T[0] = 311 + np.sin(t/3600)
+        T[-1] = 311 + np.sin(t/3600)
 
-        if jt % step == 0 or jt == temporalCells - 1:
+        # In the case the timestep has reached an incremental value for the
+        # timesteps being plotted or the final timestep in the simulation, the
+        # temperature data is stored within the plotting data.
+        if t % step == 0 or t == temporalCells - 1:
             t_index += 1
             timeEvolvingT[t_index, :] = T
 
