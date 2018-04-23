@@ -69,6 +69,10 @@ def CrankNicolson_T(L_rod=1, t_max=3000, Dx=0.02, Dt=2, T0=293, Tb=311,
     parameters = (Dx, Dt, step)
     return T_plot, parameters
 
+#------------------------------------------------------------------------------#
+#--------------------------------- Prototype ----------------------------------#
+#------------------------------------------------------------------------------#
+
 def CrankNicolson_1D(length, time, dx, dt, insulation, wall_thickness, step = 20):
     # Quantize Space and Time:
     temporalCells = int(time // dt)             # Time
@@ -104,7 +108,7 @@ def CrankNicolson_1D(length, time, dx, dt, insulation, wall_thickness, step = 20
 
     # Define the thermal diffusivity constant at each spatial cell.
     eta = kappa * dt / (c_heat * rho * dx**2)
-
+    print(eta)
     # Create an array to store the temperature at each spatial cell and create
     # an additional 2D array to store the temperature values in space and time
     # for plotting purposes.
@@ -134,9 +138,11 @@ def CrankNicolson_1D(length, time, dx, dt, insulation, wall_thickness, step = 20
     beta = 2/eta - 2
 
     M_eta = np.diagflat(-np.ones(dimension - 1), 1) + \
+            np.diagflat(alpha[1:-1], 0) + \
             np.diagflat(-np.ones(dimension - 1), -1)
-    for i in range(dimension - 1):
-        M_eta[i, i] = alpha[i + 1]
+
+    #for i in range(dimension - 1):
+    #    M_eta[i, i] = alpha[i + 1]
 
     bT = np.zeros(dimension)
 
@@ -146,9 +152,9 @@ def CrankNicolson_1D(length, time, dx, dt, insulation, wall_thickness, step = 20
     timeEvolvingT[t_index, :] = T
 
     for jt in range(1, temporalCells):
-        bT[:] = T[:-2] + T[2:]
-        for i in range(dimension - 1):
-            bT[i] = beta[i + 1] * T[i + 1]
+        bT[:] = T[:-2] + beta[1:-1] * T[1:-1] + T[2:]
+        #for i in range(dimension - 1):
+        #    bT[i] = beta[i + 1] * T[i + 1]
 
         bT[0] += 311 + np.sin(jt + 1)
         bT[-1] += 311 + np.sin(jt + 1)
