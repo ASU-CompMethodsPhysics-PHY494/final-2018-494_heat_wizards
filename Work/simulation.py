@@ -124,7 +124,6 @@ def CrankNicolson_1D(season, insulation, wall_thickness, length,
     # The simulation is conducted for all timesteps not including the initial
     # time, t = 0, since that has been defined by the conditions.
     for t in range(1, temporalCells):
-        print(t)
         # Define the temperature values at the previous timestep that contribute
         # to the next timestep's temperatures.
         bT[:] = T[:-2] + beta[1:-1] * T[1:-1] + T[2:]
@@ -174,29 +173,29 @@ def CrankNicolson_2D(season, insulation, wall_thickness, length, width,
     # terior of the house.
 
     # Wall Cells (Bottom) - Insulation Material
-    kappa[:wallCells, :] = 237
-    c_heat[:wallCells, :] = 900
-    rho[:wallCells, :] = 2700
+    kappa[:wallCells, :] = conditions.kappa[insulation]
+    c_heat[:wallCells, :] = conditions.c_heat[insulation]
+    rho[:wallCells, :] = conditions.rho[insulation]
 
     # Wall Cells (Left) - Insulation Material
-    kappa[:, :wallCells] = 237
-    c_heat[:, :wallCells] = 900
-    rho[:, :wallCells] = 2700
+    kappa[:, :wallCells] = conditions.kappa[insulation]
+    c_heat[:, :wallCells] = conditions.c_heat[insulation]
+    rho[:, :wallCells] = conditions.rho[insulation]
 
     # Interior Cells - Air
-    kappa[wallCells:-wallCells, wallCells:-wallCells] = 2.624
-    c_heat[wallCells:-wallCells, wallCells:-wallCells] = 1000
-    rho[wallCells:-wallCells, wallCells:-wallCells] = 1.204
+    kappa[wallCells:-wallCells, wallCells:-wallCells] = conditions.kappa[0]
+    c_heat[wallCells:-wallCells, wallCells:-wallCells] = conditions.c_heat[0]
+    rho[wallCells:-wallCells, wallCells:-wallCells] = conditions.rho[0]
 
     # Wall Cells (Top) - Insulation Material
-    kappa[-wallCells:, :] = 237
-    c_heat[-wallCells:, :] = 900
-    rho[-wallCells:, :] = 2700
+    kappa[-wallCells:, :] = conditions.kappa[insulation]
+    c_heat[-wallCells:, :] = conditions.c_heat[insulation]
+    rho[-wallCells:, :] = conditions.rho[insulation]
 
     # Wall Cells (Right) - Insulation Material
-    kappa[:, -wallCells:] = 237
-    c_heat[: -wallCells:] = 900
-    rho[: -wallCells:] = 2700
+    kappa[:, -wallCells:] = conditions.kappa[insulation]
+    c_heat[: -wallCells:] = conditions.c_heat[insulation]
+    rho[: -wallCells:] = conditions.rho[insulation]
 
     # Define the thermal diffusivity constant at each spatial cell.
     eta = kappa * dt / (c_heat * rho * dx**2)
@@ -212,10 +211,10 @@ def CrankNicolson_2D(season, insulation, wall_thickness, length, width,
                               xSpatialCells, ySpatialCells))
 
     # Initial Condition(s):
-    T[1:-1, 1:-1] = 293 # About room temp
+    T[1:-1, 1:-1] = conditions.T0
 
     # Boundary Condition(s):
-    T[0, :] = T[:, 0] = T[-1, :] = T[:, -1] = 311 # 100 degrees F
+    T[0, :] = T[:, 0] = T[-1, :] = T[:, -1] = conditions.boundary(season, 0)
 
     #--------------------------------------------------------------------------#
 
@@ -265,16 +264,15 @@ def CrankNicolson_2D(season, insulation, wall_thickness, length, width,
 
         # Update the boundary values to account for the boundary at the next
         # timestep.
-        bT[0] += 311 + np.sin(t/3600)
-        bT[-1] += 311 + np.sin(t/3600)
+        bT[0] += conditions.boundary(season, t * dt)
+        bT[-1] += conditions.boundary(season, t * dt)
 
         # Solve the matrix equation using the predefined inverse rather than
         # using np.linalg.solve().
         T[1:-1] = np.dot(inv_M_eta, bT)
 
         # Update the boundary temperatures.
-        T[0] = 311 + np.sin(t/3600)
-        T[-1] = 311 + np.sin(t/3600)
+        T[0] = T[-1] = conditions.boundary(season, t * dt)
 
         # In the case the timestep has reached an incremental value for the
         # timesteps being plotted or the final timestep in the simulation, the

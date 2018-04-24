@@ -15,12 +15,16 @@ materialList = \
     'iron'
 ]
 
-# Enumerations:
+# Material Enumeration:
 class material:
     air, iron = range(len(materialList))
 
+# Season Enumeration:
 class season:
     summer, winter = range(2)
 
-T_plot, (dx, dt, step) = sim.CrankNicolson_1D(season.summer, material.iron, 1, 50)
-plot.plot_T(T_plot, dx, dt, step)
+T_plot, (dx, dt, steps) = sim.CrankNicolson_1D(season.summer, material.iron, 1, 50, dt = 100)
+plot.timeEvolution(season.summer, material.iron, T_plot, dx, dt, steps)
+
+#T_plot, (dx, dt, steps) = sim.CrankNicolson_1D(season.winter, material.iron, 1, 50, dt = 10)
+#plot.timeEvolution(season.summer, material.iron, T_plot, dx, dt, steps)
