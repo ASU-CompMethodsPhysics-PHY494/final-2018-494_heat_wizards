@@ -7,10 +7,112 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
+# Define title's and filenames for the various plot types.
+
+#=============#
+# Plot Titles #
+#=============#
+
+title_timeEvo = \
+[
+    [
+        "Time Evolving 1D Temperature Diffusion\nSeason: Summer; Material: Air",
+        "Time Evolving 1D Temperature Diffusion\nSeason: Summer; Material: Brick",
+        "Time Evolving 1D Temperature Diffusion\nSeason: Summer; Material: Wood",
+        "Time Evolving 1D Temperature Diffusion\nSeason: Summer; Material: Copper"
+    ],
+    [
+        "Time Evolving 1D Temperature Diffusion\nSeason: Winter; Material: Air",
+        "Time Evolving 1D Temperature Diffusion\nSeason: Winter; Material: Brick",
+        "Time Evolving 1D Temperature Diffusion\nSeason: Winter; Material: Wood",
+        "Time Evolving 1D Temperature Diffusion\nSeason: Winter; Material: Copper"
+    ]
+]
+
+title_materialAnalysis = \
+[
+    "Material Analysis\nSeason: Summer",
+    "Material Analysis\nSeason: Winter"
+]
+
+title_wallAnalysis = \
+[
+    "Wall Thickness Analysis\nSeason: Summer",
+    "Wall Thickness Analysis\nSeason: Winter"
+]
+
+title_tempDistribution = \
+[
+    [
+        "2D Temperature Diffusion\nSeason: Summer; Material: Air",
+        "2D Temperature Diffusion\nSeason: Summer; Material: Brick",
+        "2D Temperature Diffusion\nSeason: Summer; Material: Wood",
+        "2D Temperature Diffusion\nSeason: Summer; Material: Copper",
+    ],
+    [
+        "2D Temperature Diffusion\nSeason: Winter; Material: Air",
+        "2D Temperature Diffusion\nSeason: Winter; Material: Brick",
+        "2D Temperature Diffusion\nSeason: Winter; Material: Wood",
+        "2D Temperature Diffusion\nSeason: Winter; Material: Copper",
+    ]
+]
+
+#================#
+# Plot Filenames #
+#================#
+
+filename_timeEvo = \
+[
+    [
+        "./TimeEvoPlots/TimeEvo_Summer_Air.png",
+        "./TimeEvoPlots/TimeEvo_Summer_Brick.png",
+        "./TimeEvoPlots/TimeEvo_Summer_Wood.png",
+        "./TimeEvoPlots/TimeEvo_Summer_Copper.png"
+    ],
+    [
+        "./TimeEvoPlots/TimeEvo_Winter_Air.png",
+        "./TimeEvoPlots/TimeEvo_Winter_Brick.png",
+        "./TimeEvoPlots/TimeEvo_Winter_Wood.png",
+        "./TimeEvoPlots/TimeEvo_Winter_Copper.png"
+    ]
+]
+
+filename_materialAnalysis = \
+[
+    "./MaterialAnalysisPlots/MaterialAnalysis_Summer.png",
+    "./MaterialAnalysisPlots/MaterialAnalysis_Winter.png"
+]
+
+filename_wallAnalysis = \
+[
+    "./WallThicknessAnalysisPlots/WallThicknessAnalysis_Summer.png",
+    "./WallThicknessAnalysisPlots/WallThicknessAnalysis_Winter.png"
+]
+
+filename_tempDistribution = \
+[
+    [
+        "./TempDistributionPlots/TempDistribution_Summer_Air.png",
+        "./TempDistributionPlots/TempDistribution_Summer_Brick.png",
+        "./TempDistributionPlots/TempDistribution_Summer_Wood.png",
+        "./TempDistributionPlots/TempDistribution_Summer_Copper.png"
+    ],
+    [
+        "./TempDistributionPlots/TempDistribution_Winter_Air.png",
+        "./TempDistributionPlots/TempDistribution_Winter_Brick.png",
+        "./TempDistributionPlots/TempDistribution_Winter_Wood.png",
+        "./TempDistributionPlots/TempDistribution_Winter_Copper.png"
+    ]
+]
+
+#====================#
+# Plotting Functions #
+#====================#
+
 # This plotting function renders the temperature distribution in 1D as a func-
 # tion of time, resulting in a 3D plot depicting the temperature T at a time and
 # position pair (t, x).
-def timeEvolution(season, insulation, data, dx, dt, steps):
+def timeEvolution(season, insulation, data, dx, dt, steps, save):
     # Define variables to easily access the data components.
     t, x = np.meshgrid(range(data.shape[0]), range(data.shape[1]))
     T = data[t, x]
@@ -19,8 +121,11 @@ def timeEvolution(season, insulation, data, dx, dt, steps):
     fig = plt.figure()
     ax = fig.add_subplot(1, 1, 1, projection = "3d")
 
-    # Set the wireframe to be active and based on the data's discretization.
+    # Set the plot type to be a wireframe plot.
     ax.plot_wireframe(t*dt*steps, x*dx, T)
+
+    # Set the plot's title.
+    ax.set_title(title_timeEvo[season][insulation])
 
     # Set the plot's labels.
     ax.set_xlabel(r"Time $t$ (s)")
@@ -30,30 +135,32 @@ def timeEvolution(season, insulation, data, dx, dt, steps):
     # Set the plot to be compactly displayed.
     fig.tight_layout()
 
+    if save:
+        # Save plot to a file.
+        fig.savefig(filename_timeEvo[season][insulation])
+
+    # Render plot.
     plt.show()
-    return ax
 
 # This plotting function renders the temperature distribution in 1D as a func-
 # tion of insulation material, resulting in a 2D plot depicting the final dis-
 # tribution after the 48-hour simulation for the various materials being inves-
-# tigated. The function is generalized so that the material list can be altered
-# to include more or less materials.
-def materialAnalysis(season, materialList, data, dx):
+# tigated.
+def materialAnalysis(season, materialList, data, dx, save):
     #
     pass
 
 # This plotting function renders the temperature distribution in 1D as a func-
 # tion of wall thickness, resulting in a 2D plot depicting the final distribu-
 # tion after the 48-hour simulation for the various wall thicknesses being in-
-# vestigated. The function is generalized so that the thickness list can be al-
-# tered to include more or less thicknesses.
-def wallAnalysis(season, thicknessList, data, dx):
+# vestigated.
+def wallAnalysis(season, thicknessList, data, dx, save):
     #
     pass
 
 # This plotting function renders the temperature distribution in 2D, resulting
 # in a 3D plot depicting the temperature T at an (x,y) coordinate in space at
 # the end of the 48-hour simulation period.
-def temperatureDistribution(season, insulation, data, dx, dy, dt, steps):
+def temperatureDistribution(season, insulation, data, dx, dy, dt, steps, save):
     #
     pass

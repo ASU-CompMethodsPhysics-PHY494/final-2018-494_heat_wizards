@@ -1,19 +1,6 @@
 # conditions.py
 # This file contains all of the boundary and initial conditions that will be
 # used to define the various problems being simulated.
-<<<<<<< HEAD
-+----------+----------------------+---------------------------+-----------------+
-| material | specific heat (J/kgK | thermal conductivity(W/mK | density (kg/m^3 |
-+----------+----------------------+---------------------------+-----------------+
-| air      | 1000                 | .0262                     | 1.177           |
-+----------+----------------------+---------------------------+-----------------+
-| brick    | 1000                 | .8                        | 1.765           |
-+----------+----------------------+---------------------------+-----------------+
-| wood     | 2000                 | .17                       | 740             |
-+----------+----------------------+---------------------------+-----------------+
-| copper   | 390                  | 385                       | 8300            |
-+----------+----------------------+---------------------------+-----------------+
-=======
 
 import numpy as np
 
@@ -33,6 +20,9 @@ time = 48 * 3600    # 48-Hour Simulation Period
 # Discretization
 dx = 0.1
 dy = 0.1
+
+dw = 0.01
+
 dt = 2
 
 # Plotting Steps
@@ -46,12 +36,14 @@ steps = 20
 materialList = \
 [
     'air',
+    'brick',
+    'wood',
     'copper'
 ]
 
 # Enumeration:
 class material:
-    air, copper = range(len(materialList))
+    air, brick, wood, copper = range(len(materialList))
 
 # Initialize Data Containers:
 kappa = np.zeros(len(materialList))
@@ -59,16 +51,22 @@ c_heat = np.zeros(len(materialList))
 rho = np.zeros(len(materialList))
 
 # Thermal Conductivity:
-kappa[material.air] = 0.0262
-kappa[1] = 237
+kappa[material.air] = 0.02624
+kappa[material.brick] = 0.8
+kappa[material.wood] = 0.17
+kappa[material.copper] = 401
 
 # Specific Heat:
 c_heat[material.air] = 1000
-c_heat[1] = 900
+c_heat[material.brick] = 900
+c_heat[material.wood] = 2000
+c_heat[material.copper] = 390
 
 # Density:
-rho[material.air] = 1.204
-rho[1] = 2700
+rho[material.air] = 1.177
+rho[material.brick] = 1900
+rho[material.wood] = 750
+rho[material.copper] = 8790
 
 #======================#
 # Initial and Boundary #
@@ -125,4 +123,3 @@ delta = (2/3) * np.pi
 # Boundary conditions:
 def boundary(season, t):
     return average[season] + amplitude[season] * np.cos((2*np.pi*t)/(24*3600) + delta)
->>>>>>> fed5d88db5831d630e77bdd90136d57c8624ab3a

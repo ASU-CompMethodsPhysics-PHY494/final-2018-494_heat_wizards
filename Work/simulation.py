@@ -10,11 +10,12 @@ import conditions
 
 def CrankNicolson_1D(season, insulation, wall_thickness, length,
                      time = conditions.time, dx = conditions.dx,
-                     dt = conditions.dt, steps = conditions.steps):
+                     dw = conditions.dw, dt = conditions.dt,
+                     steps = conditions.steps):
     # Quantize Space and Time:
     temporalCells = int(time // dt)             # Time
     interiorCells = int(length // dx)           # Interior
-    wallCells = int(wall_thickness // dx)       # Wall
+    wallCells = int(wall_thickness // dw)       # Wall
 
     spatialCells = wallCells + interiorCells + wallCells
 
@@ -124,21 +125,23 @@ def CrankNicolson_1D(season, insulation, wall_thickness, length,
     # The simulation is conducted for all timesteps not including the initial
     # time, t = 0, since that has been defined by the conditions.
     for t in range(1, temporalCells):
+        current_t = t * dt
+
         # Define the temperature values at the previous timestep that contribute
         # to the next timestep's temperatures.
         bT[:] = T[:-2] + beta[1:-1] * T[1:-1] + T[2:]
 
         # Update the boundary values to account for the boundary at the next
         # timestep.
-        bT[0] += conditions.boundary(season, t * dt)
-        bT[-1] += conditions.boundary(season, t * dt)
+        bT[0] += conditions.boundary(season, current_t)
+        bT[-1] += conditions.boundary(season, current_t)
 
         # Solve the matrix equation using the predefined inverse rather than
         # using np.linalg.solve().
         T[1:-1] = np.dot(inv_M_eta, bT)
 
         # Update the boundary temperatures.
-        T[0] = T[-1] = conditions.boundary(season, t * dt)
+        T[0] = T[-1] = conditions.boundary(season, current_t)
 
         # In the case the timestep has reached an incremental value for the
         # timesteps being plotted or the final timestep in the simulation, the
@@ -152,13 +155,13 @@ def CrankNicolson_1D(season, insulation, wall_thickness, length,
 
 def CrankNicolson_2D(season, insulation, wall_thickness, length, width,
                      time = conditions.time, dx = conditions.dx,
-                     dy = conditions.dy, dt = conditions.dt,
+                     dy = conditions.dy, dw = conditions.dw, dt = conditions.dt,
                      steps = conditions.steps):
     # Quantize Space and Time:
     temporalCells = int(time // dt)             # Time
     xInteriorCells = int(length // dx)          # Interior in x
     yInteriorCells = int(width // dy)           # Interior in y
-    wallCells = int(wall_thickness // dx)       # Wall
+    wallCells = int(wall_thickness // dw)       # Wall
 
     xSpatialCells = wallCells + xInteriorCells + wallCells
     ySpatialCells = wallCells + yInteriorCells + wallCells
@@ -218,16 +221,14 @@ def CrankNicolson_2D(season, insulation, wall_thickness, length, width,
 
     #--------------------------------------------------------------------------#
 
-    # Define the tridiagonal matrix representing the system of equations solving
-    # the problem. The matrix has the following dimensions,
-    #
-    #   (spatialCells - 2) x (spatialCells - 2)
-    #
-    # and solves the equation,
-    #
-    #   M_eta * T[1:-1, t+1] = bT
+    # Using the alternating direction implicit (ADI) method, the 2D problem be-
+    # comes a case in which the finite difference problem is split into two sim-
+    # plified problems: one in which the x-derivative is taken implicitly while
+    # the other takes the y-derivative implicitly. The result is a system of
+    # equations that are symmetric and tridiagonal, allowing the 1D method to
+    # be applied twice: once in each spatial direction for a half-timestep.
 
-    # Define the dimensionality of the square tridiagonal matrix, M_eta.
+    # Define the dimensionality of the square tridiagonal matrices.
     xDimension = xSpatialCells - 2
     yDimension = ySpatialCells - 2
 
