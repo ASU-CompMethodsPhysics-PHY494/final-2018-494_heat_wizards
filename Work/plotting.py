@@ -148,6 +148,28 @@ def timeEvolution(season, insulation, data, dx, dt, steps, save):
 # tigated.
 def materialAnalysis(season, materialList, data, dx, save):
     #
+   
+    ......
+    
+    # Set the plot's title.
+    ax.set_title(title_materialAnalysis[season][materialList])
+
+    # Set the plot's labels.
+    ax.set_xlabel(r"Temperature $T$ (K)")
+    ax.set_ylabel(r"Position $x$ (m)")
+    #ax.set_zlabel(r"Temperature $T$ (K)")
+
+    # Set the plot to be compactly displayed.
+    fig.tight_layout()
+
+    #if save:
+        # Save plot to a file.
+        #fig.savefig(filename_timeEvo[season][insulation])
+
+    # Render plot.
+    plt.show()
+
+    
     pass
 
 # This plotting function renders the temperature distribution in 1D as a func-
