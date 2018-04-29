@@ -148,8 +148,15 @@ def timeEvolution(season, insulation, data, dx, dt, steps, save):
 # tigated.
 def materialAnalysis(season, materialList, data, dx, save):
     #
-   
-    ......
+    x = np.meshgrid(range(data.shape[1]))
+    T = data[x]
+
+    # Define a figure as a base on which the final plot will be displayed.
+    fig = plt.figure()
+    ax = fig.add_subplot(1, 1, 1, projection = "2d")
+
+    # Set the plot type to be a wireframe plot.
+    ax.plot_wireframe(T, x*dx)
     
     # Set the plot's title.
     ax.set_title(title_materialAnalysis[season][materialList])
@@ -157,14 +164,14 @@ def materialAnalysis(season, materialList, data, dx, save):
     # Set the plot's labels.
     ax.set_xlabel(r"Temperature $T$ (K)")
     ax.set_ylabel(r"Position $x$ (m)")
-    #ax.set_zlabel(r"Temperature $T$ (K)")
+    
 
     # Set the plot to be compactly displayed.
     fig.tight_layout()
 
-    #if save:
+    if save:
         # Save plot to a file.
-        #fig.savefig(filename_timeEvo[season][insulation])
+        fig.savefig(filename_materialAnalysis[season][materialList])
 
     # Render plot.
     plt.show()
