@@ -1,22 +1,6 @@
 # conditions.py
 # This file contains all of the boundary and initial conditions that will be
 # used to define the various problems being simulated.
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-+----------+----------------------+---------------------------+-----------------+
-| material | specific heat (J/kgK | thermal conductivity(W/mK | density (kg/m^3 |
-+----------+----------------------+---------------------------+-----------------+
-| air      | 1000                 | .0262                     | 1.177           |
-+----------+----------------------+---------------------------+-----------------+
-| brick    | 900                 | .8                        | 1900           |
-+----------+----------------------+---------------------------+-----------------+
-| wood     | 2000                 | .17                       | 750             |
-+----------+----------------------+---------------------------+-----------------+
-| copper   | 390                  | 401                       | 8790           |
-+----------+----------------------+---------------------------+-----------------+
-================
->>>>>>> 37b0b50b1b3267dd6fad8c8d38fc6c318b435c6f
 
 import numpy as np
 
@@ -43,6 +27,25 @@ dt = 2
 
 # Plotting Steps
 steps = 20
+
+#======================#
+# Default Square House #
+#      Dimensions      #
+#======================#
+length = 25
+wall_thickness = 0.15
+
+interiorCells = int(length // dx)
+wallCells = int(wall_thickness // dw)
+
+spatialCells = wallCells + interiorCells + wallCells
+
+# Create position array accurately reflecting discretization.
+x = np.array(range(spatialCells))
+
+x[:wallCells] = dw * x[:wallCells]
+x[wallCells:-wallCells] = wall_thickness + dx * x[wallCells:-wallCells]
+x[-wallCells:] = wall_thickness + length + dw * x[-wallCells:]
 
 #=====================#
 # Material Properties #

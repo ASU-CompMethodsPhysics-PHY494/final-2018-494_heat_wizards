@@ -146,38 +146,40 @@ def timeEvolution(season, insulation, data, dx, dt, steps, save):
 # tion of insulation material, resulting in a 2D plot depicting the final dis-
 # tribution after the 48-hour simulation for the various materials being inves-
 # tigated.
-def materialAnalysis(season, materialList, data, dx, save):
-    #
-    x = np.meshgrid(range(data.shape[1]))
-    T = data[x]
+def materialAnalysis(season, materialList, data, xData, dx, save):
+    # Define variables to easily access the data components.
+    x = np.array(range(len(xData)))
+
+    #airT = data[0, x]
+    #brickT = data[1, x]
+    #woodT = data[2, x]
+    #copperT = data[3, x]
 
     # Define a figure as a base on which the final plot will be displayed.
     fig = plt.figure()
-    ax = fig.add_subplot(1, 1, 1, projection = "2d")
+    ax = fig.add_subplot(1, 1, 1)
 
-    # Set the plot type to be a wireframe plot.
-    ax.plot_wireframe(T, x*dx)
-    
+    ax.plot(x*dx, data[0,:], 'b-')
+    ax.plot(x*dx, data[1,:], 'r-')
+    ax.plot(x*dx, data[2,:], 'g-')
+    ax.plot(x*dx, data[3,:], 'k-')
+
     # Set the plot's title.
-    ax.set_title(title_materialAnalysis[season][materialList])
+    ax.set_title(title_materialAnalysis[season])
 
     # Set the plot's labels.
-    ax.set_xlabel(r"Temperature $T$ (K)")
-    ax.set_ylabel(r"Position $x$ (m)")
-    
+    ax.set_xlabel(r"Position $x$ (m)")
+    ax.set_ylabel(r"Temperature $T$ (K)")
 
     # Set the plot to be compactly displayed.
     fig.tight_layout()
 
     if save:
         # Save plot to a file.
-        fig.savefig(filename_materialAnalysis[season][materialList])
+        fig.savefig(filename_materialAnalysis[season])
 
     # Render plot.
     plt.show()
-
-    
-    pass
 
 # This plotting function renders the temperature distribution in 1D as a func-
 # tion of wall thickness, resulting in a 2D plot depicting the final distribu-
