@@ -28,25 +28,6 @@ dt = 2
 # Plotting Steps
 steps = 20
 
-#======================#
-# Default Square House #
-#      Dimensions      #
-#======================#
-length = 25
-wall_thickness = 0.15
-
-interiorCells = int(length // dx)
-wallCells = int(wall_thickness // dw)
-
-spatialCells = wallCells + interiorCells + wallCells
-
-# Create position array accurately reflecting discretization.
-x = np.array(range(spatialCells))
-
-x[:wallCells] = dw * x[:wallCells]
-x[wallCells:-wallCells] = wall_thickness + dx * x[wallCells:-wallCells]
-x[-wallCells:] = wall_thickness + length + dw * x[-wallCells:]
-
 #=====================#
 # Material Properties #
 #=====================#
