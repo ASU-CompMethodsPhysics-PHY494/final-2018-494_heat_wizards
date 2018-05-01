@@ -85,6 +85,7 @@ spatialCells = \
 
 # Create position arrays accurately reflecting discretizations.
 xData = []
+wData = []
 
 for index in range(len(spatialCells)):
     xTemp = np.zeros(spatialCells[index])
@@ -103,6 +104,10 @@ for index in range(len(spatialCells)):
 
     xData.append(xTemp)
 
+    # Well-Defined Wall
+    wTemp = data.dw_zoom * np.array(range(int(wall_thickness[index] // data.dw_zoom)))
+    wData.append(wTemp)
+
 #===========#
 # Main Code #
 #===========#
@@ -120,13 +125,25 @@ brickData, (dx, dt, steps) = sim.CrankNicolson_1D(season.summer, material.brick,
 woodData, (dx, dt, steps) = sim.CrankNicolson_1D(season.summer, material.wood, wall_thickness[wall.average], length, time=time, dt=100)
 copperData, (dx, dt, steps) = sim.CrankNicolson_1D(season.summer, material.copper, wall_thickness[wall.average], length, time=time, dt=100)
 
-materialData = np.zeros((4, spatialCells[wall.average]))
-materialData[0] = airData[-1, :]
-materialData[1] = brickData[-1, :]
-materialData[2] = woodData[-1, :]
-materialData[3] = copperData[-1, :]
+airData_zoom, (dx, dt, steps) = sim.CrankNicolson_1D(season.summer, material.air, wall_thickness[wall.average], length, time=time, dw=0.001, dt=100)
+brickData_zoom, (dx, dt, steps) = sim.CrankNicolson_1D(season.summer, material.brick, wall_thickness[wall.average], length, time=time, dw=0.001, dt=100)
+woodData_zoom, (dx, dt, steps) = sim.CrankNicolson_1D(season.summer, material.wood, wall_thickness[wall.average], length, time=time, dw=0.001, dt=100)
+copperData_zoom, (dx, dt, steps) = sim.CrankNicolson_1D(season.summer, material.copper, wall_thickness[wall.average], length, time=time, dw=0.001, dt=100)
 
-plot.materialAnalysis(season.summer, materialList, materialData, xData[wall.average], save)
+materialData = []
+materialData.append(airData[-1, :])
+materialData.append(brickData[-1, :])
+materialData.append(woodData[-1, :])
+materialData.append(copperData[-1, :])
+
+materialData_zoom = []
+materialData_zoom.append(airData_zoom[-1, :])
+materialData_zoom.append(brickData_zoom[-1, :])
+materialData_zoom.append(woodData_zoom[-1, :])
+materialData_zoom.append(copperData_zoom[-1, :])
+
+plot.materialAnalysis(season.summer, materialList, materialData, xData[wall.average], wData[wall.average], False, save)
+plot.materialAnalysis(season.summer, materialList, materialData_zoom, xData[wall.average], wData[wall.average], True, save)
 
 
 

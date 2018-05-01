@@ -83,6 +83,12 @@ filename_materialAnalysis = \
     "./MaterialAnalysisPlots/MaterialAnalysis_Winter.png"
 ]
 
+filename_materialAnalysis_zoom = \
+[
+    "./MaterialAnalysisPlots/MaterialAnalysis_Summer_Zoom.png",
+    "./MaterialAnalysisPlots/MaterialAnalysis_Winter_Zoom.png"
+]
+
 filename_wallAnalysis = \
 [
     "./WallThicknessAnalysisPlots/WallThicknessAnalysis_Summer.png",
@@ -118,9 +124,9 @@ def timeEvolution(season, insulation, data, dx, dt, steps, save):
     T = data[t, x]
 
     # Alter position data to account for varying wall discretization.
-    #x = np.transpose(x)
-    #x[:, :] = xData[:]
-    #x = np.transpose(x)
+    # x = np.transpose(x)
+    # x[:, :] = xData[:]
+    # x = np.transpose(x)
 
     # Define a figure as a base on which the final plot will be displayed.
     fig = plt.figure()
@@ -151,20 +157,30 @@ def timeEvolution(season, insulation, data, dx, dt, steps, save):
 # tion of insulation material, resulting in a 2D plot depicting the final dis-
 # tribution after the 48-hour simulation for the various materials being inves-
 # tigated.
-def materialAnalysis(season, materialList, data, xData, save):
+def materialAnalysis(season, materialList, data, xData, wData, zoom, save):
     # Define a figure as a base on which the final plot will be displayed.
     fig = plt.figure()
     ax = fig.add_subplot(1, 1, 1)
 
     # Add data sets to the figure.
-    ax.plot(xData, data[0, :], color = 'skyblue', linestyle = 'solid',
-            label = materialList[0])
-    ax.plot(xData, data[1, :], color = 'black', linestyle = 'dotted',
-            label = materialList[1])
-    ax.plot(xData, data[2, :], color = 'forestgreen', linestyle = 'dashdot',
-            label = materialList[2])
-    ax.plot(xData, data[3, :], color = 'slategrey', linestyle = 'dashed',
-            label = materialList[3])
+    if zoom:
+        ax.plot(wData, data[0][:len(wData)], color = 'skyblue',
+                linestyle = 'solid', label = materialList[0])
+        ax.plot(wData, data[1][:len(wData)], color = 'black',
+                linestyle = 'dotted', label = materialList[1])
+        ax.plot(wData, data[2][:len(wData)], color = 'forestgreen',
+                linestyle = 'dashdot', label = materialList[2])
+        ax.plot(wData, data[3][:len(wData)], color = 'slategrey',
+                linestyle = 'dashed', label = materialList[3])
+    else:
+        ax.plot(xData, data[0], color = 'skyblue', linestyle = 'solid',
+                label = materialList[0])
+        ax.plot(xData, data[1], color = 'black', linestyle = 'dotted',
+                label = materialList[1])
+        ax.plot(xData, data[2], color = 'forestgreen', linestyle = 'dashdot',
+                label = materialList[2])
+        ax.plot(xData, data[3], color = 'slategrey', linestyle = 'dashed',
+                label = materialList[3])
 
     # Set the plot's title.
     ax.set_title(title_materialAnalysis[season])
@@ -180,7 +196,10 @@ def materialAnalysis(season, materialList, data, xData, save):
 
     if save:
         # Save plot to a file.
-        fig.savefig(filename_materialAnalysis[season])
+        if zoom:
+            fig.savefig(filename_materialAnalysis_zoom[season])
+        else:
+            fig.savefig(filename_materialAnalysis[season])
 
     # Render plot.
     plt.show()
