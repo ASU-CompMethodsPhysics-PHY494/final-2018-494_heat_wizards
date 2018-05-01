@@ -15,7 +15,7 @@ import numpy as np
 #====================#
 # Default Parameters #
 #====================#
-time = 48 * 3600    # 48-Hour Simulation Period
+time = 2 * (24 * 3600)  # 2-Day Simulation Period
 
 # Discretization
 dx = 0.1

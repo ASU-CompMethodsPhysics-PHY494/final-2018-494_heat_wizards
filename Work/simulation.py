@@ -150,8 +150,8 @@ def CrankNicolson_1D(season, insulation, wall_thickness, length,
             t_index += 1
             timeEvolvingT[t_index, :] = T
 
-    parameters = (dx, dt, steps)
-    return timeEvolvingT, parameters
+    # parameters = (dx, dt, steps)
+    return timeEvolvingT
 
 def CrankNicolson_2D(season, insulation, wall_thickness, length, width,
                      time = conditions.time, dx = conditions.dx,
@@ -282,5 +282,5 @@ def CrankNicolson_2D(season, insulation, wall_thickness, length, width,
             t_index += 1
             timeEvolvingT[t_index, :] = T
 
-    parameters = (dx, dy, dt, steps)
-    return timeEvolvingT, parameters
+    # parameters = (dx, dy, dt, steps)
+    return timeEvolvingT

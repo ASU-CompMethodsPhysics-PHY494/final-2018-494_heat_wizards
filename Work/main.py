@@ -9,6 +9,13 @@ import conditions as data
 import simulation as sim
 import plotting as plot
 
+# Parameter determining whether plots are saved to files or not.
+save = True
+
+# Parameters to define how fine to sample in time.
+time = data.time
+dt = data.dt
+
 #===============#
 # Seasonal Data #
 #===============#
@@ -108,65 +115,91 @@ for index in range(len(spatialCells)):
     wTemp = data.dw_zoom * np.array(range(int(wall_thickness[index] // data.dw_zoom)))
     wData.append(wTemp)
 
-#===========#
-# Main Code #
-#===========#
+#==============================================================================#
+#---------------------------------- Analysis ----------------------------------#
+#==============================================================================#
 
-save = False
-time = 10*24*3600
+# Cycle simulations over seasons.
+for seasons in range(2):
+    #===================#
+    # 1D Time Evolution #
+    #      Analysis     #
+    #===================#
 
-T_plot, (dx, dt, steps) = sim.CrankNicolson_1D(season.summer, material.air, wall_thickness[wall.average], length, time=time, dt=100)
-plot.timeEvolution(season.summer, material.wood, T_plot, dx, dt, steps, save)
+    # Cycle simulations over materials.
+    for materials in range(len(materialList)):
+        # Simulate:
+        T_plot = sim.CrankNicolson_1D(seasons, materials,
+                                      wall_thickness[wall.average], length,
+                                      time = time, dt = dt)
 
+        # Plot Results:
+        plot.timeEvolution(seasons, materials, T_plot,
+                           data.dx, data.dt, data.steps, save)
 
+    #======================#
+    # 1D Material Analysis #
+    #======================#
 
-airData, (dx, dt, steps) = sim.CrankNicolson_1D(season.summer, material.air, wall_thickness[wall.average], length, time=time, dt=100)
-brickData, (dx, dt, steps) = sim.CrankNicolson_1D(season.summer, material.brick, wall_thickness[wall.average], length, time=time, dt=100)
-woodData, (dx, dt, steps) = sim.CrankNicolson_1D(season.summer, material.wood, wall_thickness[wall.average], length, time=time, dt=100)
-copperData, (dx, dt, steps) = sim.CrankNicolson_1D(season.summer, material.copper, wall_thickness[wall.average], length, time=time, dt=100)
+    # Parameter determining the domain of the results.
+    # Initial analysis is set to cover the entire house.
+    zoom = False
 
-airData_zoom, (dx, dt, steps) = sim.CrankNicolson_1D(season.summer, material.air, wall_thickness[wall.average], length, time=time, dw=0.001, dt=100)
-brickData_zoom, (dx, dt, steps) = sim.CrankNicolson_1D(season.summer, material.brick, wall_thickness[wall.average], length, time=time, dw=0.001, dt=100)
-woodData_zoom, (dx, dt, steps) = sim.CrankNicolson_1D(season.summer, material.wood, wall_thickness[wall.average], length, time=time, dw=0.001, dt=100)
-copperData_zoom, (dx, dt, steps) = sim.CrankNicolson_1D(season.summer, material.copper, wall_thickness[wall.average], length, time=time, dw=0.001, dt=100)
+    # Simulate:
+    airData = sim.CrankNicolson_1D(seasons, material.air, wall_thickness[wall.average], length, time = time, dt = dt)
+    brickData = sim.CrankNicolson_1D(seasons, material.brick, wall_thickness[wall.average], length, time = time, dt = dt)
+    woodData = sim.CrankNicolson_1D(seasons, material.wood, wall_thickness[wall.average], length, time = time, dt = dt)
+    copperData = sim.CrankNicolson_1D(seasons, material.copper, wall_thickness[wall.average], length, time = time, dt = dt)
 
-materialData = []
-materialData.append(airData[-1, :])
-materialData.append(brickData[-1, :])
-materialData.append(woodData[-1, :])
-materialData.append(copperData[-1, :])
+    materialData = []
+    materialData.append(airData[-1, :])
+    materialData.append(brickData[-1, :])
+    materialData.append(woodData[-1, :])
+    materialData.append(copperData[-1, :])
 
-materialData_zoom = []
-materialData_zoom.append(airData_zoom[-1, :])
-materialData_zoom.append(brickData_zoom[-1, :])
-materialData_zoom.append(woodData_zoom[-1, :])
-materialData_zoom.append(copperData_zoom[-1, :])
+    # Plot Results:
+    plot.materialAnalysis(seasons, materialList, materialData,
+                          xData[wall.average], wData[wall.average], zoom, save)
 
-plot.materialAnalysis(season.summer, materialList, materialData, xData[wall.average], wData[wall.average], False, save)
-plot.materialAnalysis(season.summer, materialList, materialData_zoom, xData[wall.average], wData[wall.average], True, save)
+    # Following analysis is set to cover a single wall.
+    zoom = True
 
+    # Simulate:
+    airData = sim.CrankNicolson_1D(seasons, material.air, wall_thickness[wall.average], length, time = time, dw = data.dw_zoom, dt = dt)
+    brickData = sim.CrankNicolson_1D(seasons, material.brick, wall_thickness[wall.average], length, time = time, dw = data.dw_zoom, dt = dt)
+    woodData = sim.CrankNicolson_1D(seasons, material.wood, wall_thickness[wall.average], length, time = time, dw = data.dw_zoom, dt = dt)
+    copperData = sim.CrankNicolson_1D(seasons, material.copper, wall_thickness[wall.average], length, time = time, dw = data.dw_zoom, dt = dt)
 
+    materialData = []
+    materialData.append(airData[-1, :])
+    materialData.append(brickData[-1, :])
+    materialData.append(woodData[-1, :])
+    materialData.append(copperData[-1, :])
 
-wall0Data, (dx, dt, steps) = sim.CrankNicolson_1D(season.summer, material.copper, wall_thickness[wall.thin], length, time=time, dt=100)
-wall1Data, (dx, dt, steps) = sim.CrankNicolson_1D(season.summer, material.copper, wall_thickness[wall.average], length, time=time, dt=100)
-wall2Data, (dx, dt, steps) = sim.CrankNicolson_1D(season.summer, material.copper, wall_thickness[wall.thick], length, time=time, dt=100)
-wall3Data, (dx, dt, steps) = sim.CrankNicolson_1D(season.summer, material.copper, wall_thickness[wall.outlier], length, time=time, dt=100)
+    # Plot Results:
+    plot.materialAnalysis(seasons, materialList, materialData,
+                          xData[wall.average], wData[wall.average], zoom, save)
 
-wallData = []
-wallData.append(wall0Data[-1, :])
-wallData.append(wall1Data[-1, :])
-wallData.append(wall2Data[-1, :])
-wallData.append(wall3Data[-1, :])
+    #===================#
+    # 1D Wall Thickness #
+    #      Analysis     #
+    #===================#
 
-plot.wallAnalysis(season.summer, thicknessList, wallData, xData, save)
+    # Note: Wall thickness analysis is done using copper as the constant insul-
+    #       ation material since it has the most apparent effect in the results
+    #       due to its physical properties.
 
+    # Simulate:
+    thinWallData = sim.CrankNicolson_1D(seasons, material.copper, wall_thickness[wall.thin], length, time = time, dt = dt)
+    averageWallData = sim.CrankNicolson_1D(seasons, material.copper, wall_thickness[wall.average], length, time = time, dt = dt)
+    thickWallData = sim.CrankNicolson_1D(seasons, material.copper, wall_thickness[wall.thick], length, time = time, dt = dt)
+    outlierWallData = sim.CrankNicolson_1D(seasons, material.copper, wall_thickness[wall.outlier], length, time = time, dt = dt)
 
+    wallData = []
+    wallData.append(thinWallData[-1, :])
+    wallData.append(averageWallData[-1, :])
+    wallData.append(thickWallData[-1, :])
+    wallData.append(outlierWallData[-1, :])
 
-#T_plot, (dx, dt, steps) = sim.CrankNicolson_1D(season.winter, material.iron, 1, 50, dt = 10)
-#plot.timeEvolution(season.summer, material.iron, T_plot, dx, dt, steps)
-
-#save = True
-#for i in range(2):
-#    for j in range(len(materialList)):
-#        T_plot, (dx, dt, steps) = sim.CrankNicolson_1D(i, j, 0.12, 50)
-#        plot.timeEvolution(i, j, T_plot, dx, dt, steps, save)
+    # Plot Results:
+    plot.wallAnalysis(seasons, thicknessList, wallData, xData, save)
