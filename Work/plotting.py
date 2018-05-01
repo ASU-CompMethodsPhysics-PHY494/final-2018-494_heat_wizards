@@ -155,8 +155,7 @@ def timeEvolution(season, insulation, data, dx, dt, steps, save):
 
 # This plotting function renders the temperature distribution in 1D as a func-
 # tion of insulation material, resulting in a 2D plot depicting the final dis-
-# tribution after the 48-hour simulation for the various materials being inves-
-# tigated.
+# tribution after the simulation for the various materials being investigated.
 def materialAnalysis(season, materialList, data, xData, wData, zoom, save):
     # Define a figure as a base on which the final plot will be displayed.
     fig = plt.figure()
@@ -206,8 +205,7 @@ def materialAnalysis(season, materialList, data, xData, wData, zoom, save):
 
 # This plotting function renders the temperature distribution in 1D as a func-
 # tion of wall thickness, resulting in a 2D plot depicting the final distribu-
-# tion after the 48-hour simulation for the various wall thicknesses being in-
-# vestigated.
+# tion after the simulation for the various wall thicknesses being investigated.
 def wallAnalysis(season, thicknessList, data, xData, save):
     # Define a figure as a base on which the final plot will be displayed.
     fig = plt.figure()
@@ -244,7 +242,33 @@ def wallAnalysis(season, thicknessList, data, xData, save):
 
 # This plotting function renders the temperature distribution in 2D, resulting
 # in a 3D plot depicting the temperature T at an (x,y) coordinate in space at
-# the end of the 48-hour simulation period.
+# the end of the simulation period.
 def temperatureDistribution(season, insulation, data, dx, dy, dt, steps, save):
-    #
-    pass
+    # Define variables to easily access the data components.
+    x, y = np.meshgrid(range(data.shape[1]), range(data.shape[2]))
+    T = data[-1, x, y]
+
+    # Define a figure as a base on which the final plot will be displayed.
+    fig = plt.figure()
+    ax = fig.add_subplot(1, 1, 1, projection = "3d")
+
+    # Set the plot type to be a wireframe plot.
+    ax.plot_wireframe(x*dx, y*dy, T)
+
+    # Set the plot's title.
+    ax.set_title(title_tempDistribution[season][insulation])
+
+    # Set the plot's labels.
+    ax.set_xlabel(r"Position $x$ (m)")
+    ax.set_ylabel(r"Position $y$ (m)")
+    ax.set_zlabel(r"Temperature $T$ (K)")
+
+    # Set the plot to be compactly displayed.
+    fig.tight_layout()
+
+    if save:
+        # Save plot to a file.
+        fig.savefig(filename_tempDistribution[season][insulation])
+
+    # Render plot.
+    plt.show()

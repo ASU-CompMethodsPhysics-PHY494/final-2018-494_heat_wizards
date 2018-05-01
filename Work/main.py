@@ -65,6 +65,7 @@ class wall:
 
 # Physical Distances (m)
 length = 25
+width = 25
 wall_thickness = \
 [
     0.10,   # Thin
@@ -125,7 +126,7 @@ for seasons in range(2):
     # 1D Time Evolution #
     #      Analysis     #
     #===================#
-
+    
     # Cycle simulations over materials.
     for materials in range(len(materialList)):
         # Simulate:
@@ -203,3 +204,24 @@ for seasons in range(2):
 
     # Plot Results:
     plot.wallAnalysis(seasons, thicknessList, wallData, xData, save)
+
+    #================#
+    # 2D Temperature #
+    #  Distribution  #
+    #================#
+
+    # Note: The implementation of the Crank-Nicolson algorithm is inefficient in
+    #       time due to an insufficient understanding of slicing. Therefore, the
+    #       parameters for the simulation are altered to reduce the number of
+    #       computations done overall.
+
+    # Cycle simulations over materials.
+    for materials in range(len(materialList)):
+        # Simulate:
+        T_plot = sim.CrankNicolson_2D(seasons, materials,
+                                      wall_thickness[wall.average], length, width,
+                                      time = time, dt = 100 * dt)
+
+        # Plot Results:
+        plot.temperatureDistribution(seasons, materials, T_plot,
+                                     data.dx, data.dy, data.dt, data.steps, save)
