@@ -1,0 +1,25 @@
+Housing Structural Heat Analysis
+
+494 Heat Wizards:
+Marko Gonzales, Zhichao Ma, Milan Patel
+
+Our team investigated the temperature distribution within a basic house over a
+two day period during summer and winter by simulating the heat equation in 1D
+and 2D for various materials and wall thicknesses. The problem is particularly
+interesting in the context of living in Arizona as the data will indicate what
+kinds of insulations and wall thicknesses produce the best results for maintain-
+ing a comfortable internal house temperature without the aid of air condition-
+ing. The code used to analyze the heat equation consists of a 1D and 2D version
+of the Crank-Nicolson algorithm, producing temperature distributions that are
+then plotted in a convenient and readable manner. The simulations are run for
+the various materials and wall thicknesses in 1D before being processed into two
+sets of plots: one comparing the effects of each insulation material and another
+comparing the effects of wall thickness. The temperature distributions will de-
+pict to what degree the selected parameters allow heat to disperse through the
+walls of the house. In the future, the implementation will be extended to 3D
+while accounting for possible structural integrities, such as windows and doors.
+Additionally, realistic house layouts will be analyzed, accounting for internal
+walls/rooms.
+
+The entire code base is available at the following link:
+https://github.com/ASU-CompMethodsPhysics-PHY494/final-2018-494_heat_wizards
