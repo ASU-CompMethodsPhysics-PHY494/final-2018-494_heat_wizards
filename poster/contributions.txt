@@ -1,0 +1,16 @@
+Contributions
+
+Code Contributions:
+- In terms of the scripts written, the majority of the code was written by
+  Eroatus. markogonzales and ZhichaoMa both helped with testing and debugging
+  the code and determining whether the results were reasonable. The data used
+  within the simulator (documented within conditions.py) was collected by both
+  Eroatus (temperature fluctuations for the boundary) and markogonzales (all of
+  the material properties).
+
+Poster Contributions:
+- The poster was drafted by both markogonzales and ZhichaoMa, incrementally add-
+  ing to the file as more results were provided by Eroatus' work on the coding
+  side of the project. The methodology portion was improved upon and detailed by
+  Eroatus to reflect the code, and final editing was completed by the team as a
+  whole.
